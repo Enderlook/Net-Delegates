@@ -22,6 +22,15 @@ internal static class Helper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void GetParameters<T1, T2>([NotNull] object?[]? args, out T1 arg1, out T2 arg2)
+    {
+        if (args is null || args.Length != 2)
+            ThrowTargetParameterCountException();
+        arg1 = Cast<T1>(args[0]);
+        arg2 = Cast<T2>(args[1]);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static T Cast<T>(object? arg)
     {
         if (arg is null)
