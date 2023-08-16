@@ -7,7 +7,7 @@ namespace Enderlook.Delegates;
 /// </summary>
 public readonly struct NullableActionWrapper : IAction
 {
-    private readonly Action? callback;
+    internal readonly Action? callback;
 
     /// <summary>
     /// Wraps a dummy callback which does nothing.
@@ -53,6 +53,14 @@ public readonly struct NullableActionWrapper : IAction
     /// <returns>Wrapped callback.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Action?(NullableActionWrapper callback) => callback.callback;
+
+    /// <summary>
+    /// Extract the wrapped callback.
+    /// </summary>
+    /// <param name="callback">Wrapper to open.</param>
+    /// <returns>Wrapped callback.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator ActionWrapper(NullableActionWrapper callback) => new(callback.callback ?? ActionWrapper.Container.Shared);
 
     /// <summary>
     /// Wrap an callback.

@@ -16,7 +16,7 @@ public unsafe readonly struct ActionPointer : IAction
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ActionPointer() => callback = &Dummy;
 
-    private static void Dummy() { }
+    internal static void Dummy() { }
 
     /// <summary>
     /// Wraps an <paramref name="callback"/>.

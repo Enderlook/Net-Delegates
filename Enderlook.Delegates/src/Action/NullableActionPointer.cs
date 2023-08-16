@@ -65,6 +65,14 @@ public unsafe readonly struct NullableActionPointer : IAction
     public static implicit operator delegate* managed<void>(NullableActionPointer callback) => callback.callback;
 
     /// <summary>
+    /// Extract the wrapped callback.
+    /// </summary>
+    /// <param name="callback">Wrapper to open.</param>
+    /// <returns>Wrapped callback.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator ActionPointer(NullableActionPointer callback) => new(callback.callback == null ? &ActionPointer.Dummy : callback.callback);
+
+    /// <summary>
     /// Wrap an callback.
     /// </summary>
     /// <param name="callback">Callback to wrap.</param>

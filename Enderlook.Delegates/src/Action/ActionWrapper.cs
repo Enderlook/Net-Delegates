@@ -11,11 +11,17 @@ namespace Enderlook.Delegates;
 public readonly struct ActionWrapper : IAction, IEquatable<ActionWrapper>
 #if NET7_0_OR_GREATER
     , IAdditionOperators<ActionWrapper, ActionWrapper, ActionWrapper>
+    , IAdditionOperators<ActionWrapper, NullableActionWrapper, ActionWrapper>
+    , IAdditionOperators<ActionWrapper, Action, ActionWrapper>
     , ISubtractionOperators<ActionWrapper, ActionWrapper, ActionWrapper>
+    , ISubtractionOperators<ActionWrapper, NullableActionWrapper, ActionWrapper>
+    , ISubtractionOperators<ActionWrapper, Action, ActionWrapper>
     , IEqualityOperators<ActionWrapper, ActionWrapper, bool>
+    , IEqualityOperators<ActionWrapper, NullableActionWrapper, bool>
+    , IEqualityOperators<ActionWrapper, Action, bool>
 #endif
 {
-    private static class Container
+    internal static class Container
     {
         public static readonly Action Shared = new(() => { });
     }
@@ -88,10 +94,10 @@ public readonly struct ActionWrapper : IAction, IEquatable<ActionWrapper>
     /// <summary>
     /// Determines whether the specified callback is equal to this instance.
     /// </summary>
-    /// <param name="other">Callback to compare.</param>
-    /// <returns><see langword="true"/> if <see langword="this"/> is equal to <paramref name="other"/>. Otherwise, <see langword="false"/>.</returns>
+    /// <param name="obj">Callback to compare.</param>
+    /// <returns><see langword="true"/> if <see langword="this"/> is equal to <paramref name="obj"/>. Otherwise, <see langword="false"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Equals(object? other) => other is ActionWrapper wrapper && wrapper.callback == callback;
+    public override bool Equals(object? obj) => obj is ActionWrapper wrapper && wrapper.callback == callback;
 
     /// <summary>
     /// Determines whether the specified callback is equal to this instance.
@@ -142,7 +148,7 @@ public readonly struct ActionWrapper : IAction, IEquatable<ActionWrapper>
     /// <param name="b">Second callback to compare.</param>
     /// <returns><see langword="true"/> if <paramref name="a"/> is equal to <paramref name="b"/>. Otherwise, <see langword="false"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(ActionWrapper a, Action b) => a.callback == b;
+    public static bool operator ==(ActionWrapper a, NullableActionWrapper b) => a.callback == b.callback || (ReferenceEquals(a.callback, Container.Shared) && b.callback is null);
 
     /// <summary>
     /// Determines whether the specified callbacks are not equal.
@@ -151,7 +157,25 @@ public readonly struct ActionWrapper : IAction, IEquatable<ActionWrapper>
     /// <param name="b">Second callback to compare.</param>
     /// <returns><see langword="true"/> if <paramref name="a"/> isn't equal to <paramref name="b"/>. Otherwise, <see langword="false"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(ActionWrapper a, Action b) => a.callback != b;
+    public static bool operator !=(ActionWrapper a, NullableActionWrapper b) => a.callback != b.callback && !(ReferenceEquals(a.callback, Container.Shared) && b.callback is null);
+
+    /// <summary>
+    /// Determines whether the specified callbacks are equal.
+    /// </summary>
+    /// <param name="a">First callback to compare.</param>
+    /// <param name="b">Second callback to compare.</param>
+    /// <returns><see langword="true"/> if <paramref name="a"/> is equal to <paramref name="b"/>. Otherwise, <see langword="false"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(ActionWrapper a, Action? b) => a.callback == b;
+
+    /// <summary>
+    /// Determines whether the specified callbacks are not equal.
+    /// </summary>
+    /// <param name="a">First callback to compare.</param>
+    /// <param name="b">Second callback to compare.</param>
+    /// <returns><see langword="true"/> if <paramref name="a"/> isn't equal to <paramref name="b"/>. Otherwise, <see langword="false"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(ActionWrapper a, Action? b) => a.callback != b;
 
     /// <summary>
     /// Merge two callbacks.
@@ -170,4 +194,22 @@ public readonly struct ActionWrapper : IAction, IEquatable<ActionWrapper>
     /// <returns>A new callback with an invocation list formed by taking the invocation list of <paramref name="source"/> and removing the last ocurrence of the invocation list of <paramref name="value"/>, if the invocation list of <paramref name="value"/> is fround within the invocation list of <paramref name="source"/>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ActionWrapper operator -(ActionWrapper source, ActionWrapper value) => new((source.callback - value.callback) ?? Container.Shared);
+
+    /// <summary>
+    /// Merge two callbacks.
+    /// </summary>
+    /// <param name="a">First callback to merge.</param>
+    /// <param name="b">Second callback to merge.</param>
+    /// <returns>Merged callbacks.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ActionWrapper operator +(ActionWrapper a, Action b) => new(a.callback + b);
+
+    /// <summary>
+    /// Removes the last occurrence of the invocation list of a callback from the invocation list of another callback.
+    /// </summary>
+    /// <param name="source">The callback from which to remove the invocation list of <paramref name="value"/>.</param>
+    /// <param name="value">The callback that supplies the invocation list to remove from the invocation list of <paramref name="source"/>.</param>
+    /// <returns>A new callback with an invocation list formed by taking the invocation list of <paramref name="source"/> and removing the last ocurrence of the invocation list of <paramref name="value"/>, if the invocation list of <paramref name="value"/> is fround within the invocation list of <paramref name="source"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ActionWrapper operator -(ActionWrapper source, Action value) => new((source.callback - value) ?? Container.Shared);
 }
