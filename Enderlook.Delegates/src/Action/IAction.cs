@@ -8,7 +8,7 @@ public interface IAction : IDelegate
     /// <summary>
     /// Executes this callback.
     /// </summary>
-    public void Invoke();
+    public abstract void Invoke();
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>

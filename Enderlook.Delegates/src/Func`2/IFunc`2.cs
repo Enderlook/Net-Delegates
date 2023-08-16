@@ -15,7 +15,7 @@ public interface IFunc<in T, out TResult> : IDelegate
     /// <param name="arg">Argument to pass as parameter.</param>
     /// <typeparam name="U">Specialized type of <typeparamref name="T"/>, useful to avoid boxing or improve inlining in value types.</typeparam>
     /// <returns>Return value of the callback.</returns>
-    public TResult Invoke<U>(U arg) where U : T;
+    public abstract TResult Invoke<U>(U arg) where U : T;
 
     /// <summary>
     /// Executes this callback, and pass the return value to <paramref name="callback"/>.<br/>

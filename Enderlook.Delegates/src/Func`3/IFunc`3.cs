@@ -18,7 +18,7 @@ public interface IFunc<in T1, in T2, out TResult> : IDelegate
     /// <typeparam name="U1">Specialized type of <typeparamref name="T1"/>, useful to avoid boxing or improve inlining in value types.</typeparam>
     /// <typeparam name="U2">Specialized type of <typeparamref name="T2"/>, useful to avoid boxing or improve inlining in value types.</typeparam>
     /// <returns>Return value of the callback.</returns>
-    public TResult Invoke<U1, U2>(U1 arg1, U2 arg2)
+    public abstract TResult Invoke<U1, U2>(U1 arg1, U2 arg2)
         where U1 : T1
         where U2 : T2;
 

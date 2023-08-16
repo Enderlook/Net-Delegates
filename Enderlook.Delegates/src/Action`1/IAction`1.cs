@@ -11,7 +11,7 @@ public interface IAction<in T> : IDelegate
     /// </summary>
     /// <param name="arg">Argument to pass as parameter.</param>
     /// <typeparam name="U">Specialized type of <typeparamref name="T"/>, useful to avoid boxing or improve devirtualization.</typeparam>
-    public void Invoke<U>(U arg) where U : T;
+    public abstract void Invoke<U>(U arg) where U : T;
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>

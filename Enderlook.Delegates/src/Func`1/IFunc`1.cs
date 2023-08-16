@@ -12,7 +12,7 @@ public interface IFunc<out TResult> : IDelegate
     /// Executes this callback.
     /// </summary>
     /// <returns>Return value of the callback.</returns>
-    public TResult Invoke();
+    public abstract TResult Invoke();
 
     /// <summary>
     /// Executes this callback, and pass the return value to <paramref name="callback"/>.<br/>
