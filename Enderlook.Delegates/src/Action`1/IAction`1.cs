@@ -21,5 +21,13 @@ public interface IAction<in T> : IDelegate
         Invoke(arg1);
         return null;
     }
+
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{T}(T)"/>
+    object? IDelegate.DynamicTupleInvoke<U>(U args)
+    {
+        Helper.GetParameters(args, out T arg1);
+        Invoke(arg1);
+        return null;
+    }
 #endif
 }

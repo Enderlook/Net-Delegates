@@ -50,6 +50,19 @@ public unsafe readonly struct NullableStatedActionPointer<TState> : IAction
         return null;
     }
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args);
+        delegate*<TState, void> callback = this.callback;
+        if (callback is not null)
+            callback(state);
+        return null;
+    }
+#endif
+
     /// <summary>
     /// Cast a non nullable callback into a nullable one.
     /// </summary>

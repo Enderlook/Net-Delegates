@@ -45,5 +45,12 @@ public interface IFunc<in T, out TResult> : IDelegate
         Helper.GetParameters(args, out T arg);
         return Invoke(arg);
     }
+
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args, out T arg);
+        return Invoke(arg);
+    }
 #endif
 }

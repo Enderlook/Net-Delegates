@@ -52,4 +52,15 @@ public readonly struct StatedActionWrapper<TState, T> : IAction<T>
         callback(state, arg);
         return null;
     }
+
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args, out T arg);
+        callback(state, arg);
+        return null;
+    }
+#endif
 }

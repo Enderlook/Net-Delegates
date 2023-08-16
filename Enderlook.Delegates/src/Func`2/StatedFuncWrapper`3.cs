@@ -48,4 +48,14 @@ public readonly struct StatedFuncWrapper<TState, T, TResult> : IFunc<T, TResult>
         Helper.GetParameters(args, out T arg);
         return callback(state, arg);
     }
+
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args, out T arg);
+        return callback(state, arg);
+    }
+#endif
 }

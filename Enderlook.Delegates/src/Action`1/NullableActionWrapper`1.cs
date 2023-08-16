@@ -37,6 +37,17 @@ public readonly struct NullableActionWrapper<T> : IAction<T>
         return null;
     }
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args, out T arg);
+        callback?.Invoke(arg);
+        return null;
+    }
+#endif
+
     /// <summary>
     /// Extract the wrapped callback.
     /// </summary>

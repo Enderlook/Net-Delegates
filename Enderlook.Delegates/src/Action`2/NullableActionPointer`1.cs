@@ -46,6 +46,19 @@ public unsafe readonly struct NullableActionPointer<T1, T2> : IAction<T1, T2>
         return null;
     }
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args, out T1 arg1, out T2 arg2);
+        delegate*<T1, T2, void> callback = this.callback;
+        if (callback is not null)
+            callback(arg1, arg2);
+        return null;
+    }
+#endif
+
     /// <summary>
     /// Extract the wrapped callback.
     /// </summary>

@@ -49,6 +49,16 @@ public readonly struct FuncWrapper<T1, T2, TResult> : IFunc<T1, T2, TResult>
         return callback(arg1, arg2);
     }
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args, out T1 arg1, out T2 arg2);
+        return callback(arg1, arg2);
+    }
+#endif
+
     /// <summary>
     /// Extract the wrapped callback.
     /// </summary>

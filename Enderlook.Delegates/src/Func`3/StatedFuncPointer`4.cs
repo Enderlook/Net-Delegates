@@ -45,6 +45,16 @@ public unsafe readonly struct StatedFuncPointer<TState, T1, T2, TResult> : IFunc
         return callback(state, arg1, arg2);
     }
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args, out T1 arg1, out T2 arg2);
+        return callback(state, arg1, arg2);
+    }
+#endif
+
     /// <inheritdoc cref="IFunc{T1, T2, TResult}.Invoke{U1, U2, TAction}(U1, U2, TAction)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void IFunc<T1, T2, TResult>.Invoke<U1, U2, TAction>(U1 arg1, U2 arg2, [NotNull] TAction callback)

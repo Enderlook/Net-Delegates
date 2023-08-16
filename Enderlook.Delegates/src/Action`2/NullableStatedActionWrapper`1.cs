@@ -47,6 +47,17 @@ public readonly struct NullableStatedActionWrapper<TState, T1, T2> : IAction<T1,
         return null;
     }
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    {
+        Helper.GetParameters(args, out T1 arg1, out T2 arg2);
+        callback?.Invoke(state, arg1, arg2);
+        return null;
+    }
+#endif
+
     /// <summary>
     /// Cast a non nullable callback into a nullable one.
     /// </summary>
