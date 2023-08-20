@@ -14,7 +14,7 @@ internal static class Helper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void GetParameters<T>([NotNull] object?[]? args, out T arg)
+    public static void GetParameters<T>(object?[]? args, out T arg)
     {
         if (args is null || args.Length != 1)
             ThrowTargetParameterCountException();
@@ -22,7 +22,7 @@ internal static class Helper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void GetParameters<T1, T2>([NotNull] object?[]? args, out T1 arg1, out T2 arg2)
+    public static void GetParameters<T1, T2>(object?[]? args, out T1 arg1, out T2 arg2)
     {
         if (args is null || args.Length != 2)
             ThrowTargetParameterCountException();
@@ -32,7 +32,7 @@ internal static class Helper
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void GetParameters<T>([NotNull] T args)
+    public static void GetParameters<T>(T args)
         where T : ITuple
     {
         if (args is null)
@@ -42,7 +42,7 @@ internal static class Helper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void GetParameters<T, T1>([NotNull] T args, out T1 arg)
+    public static void GetParameters<T, T1>(T args, out T1 arg)
         where T : ITuple
     {
         if (args is null)
@@ -53,7 +53,7 @@ internal static class Helper
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void GetParameters<T, T1, T2>([NotNull] T args, out T1 arg1, out T2 arg2)
+    public static void GetParameters<T, T1, T2>(T args, out T1 arg1, out T2 arg2)
         where T : ITuple
     {
         if (args is null)

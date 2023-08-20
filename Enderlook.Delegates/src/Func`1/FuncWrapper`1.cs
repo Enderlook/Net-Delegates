@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Enderlook.Delegates;
 
@@ -18,7 +17,7 @@ public readonly struct FuncWrapper<TResult> : IFunc<TResult>
     /// <param name="callback">Callback to wrap.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="callback"/> is <see langword="null"/>.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public FuncWrapper([NotNull] Func<TResult> callback)
+    public FuncWrapper(Func<TResult> callback)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         this.callback = callback;
@@ -30,7 +29,7 @@ public readonly struct FuncWrapper<TResult> : IFunc<TResult>
 
     /// <inheritdoc cref="IFunc{TResult}.Invoke{TFunction}(TFunction)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void IFunc<TResult>.Invoke<TFunction>([NotNull] TFunction callback)
+    void IFunc<TResult>.Invoke<TFunction>(TFunction callback)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         callback.Invoke(this.callback());
@@ -68,5 +67,5 @@ public readonly struct FuncWrapper<TResult> : IFunc<TResult>
     /// <param name="callback">Callback to wrap.</param>
     /// <returns>Wrapper of callback.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator FuncWrapper<TResult>([NotNull] Func<TResult> callback) => new(callback);
+    public static implicit operator FuncWrapper<TResult>(Func<TResult> callback) => new(callback);
 }

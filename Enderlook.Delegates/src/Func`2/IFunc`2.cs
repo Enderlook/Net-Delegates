@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Enderlook.Delegates;
+﻿namespace Enderlook.Delegates;
 
 /// <summary>
 /// Interface used to declare a callback which accepts a parameter and returns a value.
@@ -30,7 +28,7 @@ public interface IFunc<in T, out TResult> : IDelegate
 #if NET5_0_OR_GREATER || NETSTANDARD2__OR_GREATER
         virtual
 #endif
-        void Invoke<U, TAction>(U arg, [NotNull] TAction callback)
+        void Invoke<U, TAction>(U arg, TAction callback)
         where U : T
         where TAction : IAction<TResult>
 #if NET5_0_OR_GREATER || NETSTANDARD2__OR_GREATER

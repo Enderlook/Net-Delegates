@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Enderlook.Delegates;
 
@@ -31,7 +29,7 @@ public unsafe readonly struct FuncPointer<TResult> : IFunc<TResult>
 
     /// <inheritdoc cref="IFunc{TResult}.Invoke{TFunction}(TFunction)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void IFunc<TResult>.Invoke<TFunction>([NotNull] TFunction callback)
+    void IFunc<TResult>.Invoke<TFunction>(TFunction callback)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         callback.Invoke(this.callback());

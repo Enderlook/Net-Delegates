@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Enderlook.Delegates;
 
@@ -27,7 +26,7 @@ public readonly struct ActionWrapper<T1, T2> : IAction<T1, T2>
     /// <param name="callback">Callback to wrap.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="callback"/> is <see langword="null"/>.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ActionWrapper([NotNull] Action<T1, T2> callback)
+    public ActionWrapper(Action<T1, T2> callback)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         this.callback = callback;
@@ -74,5 +73,5 @@ public readonly struct ActionWrapper<T1, T2> : IAction<T1, T2>
     /// <param name="callback">Callback to wrap.</param>
     /// <returns>Wrapper of callback.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator ActionWrapper<T1, T2>([NotNull] Action<T1, T2> callback) => new(callback);
+    public static implicit operator ActionWrapper<T1, T2>(Action<T1, T2> callback) => new(callback);
 }

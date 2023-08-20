@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Enderlook.Delegates;
 
@@ -53,7 +52,7 @@ public unsafe readonly struct StatedFuncPointer<TState, T, TResult> : IFunc<T, T
 
     /// <inheritdoc cref="IFunc{T, TResult}.Invoke{U, TAction}(U, TAction)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void IFunc<T, TResult>.Invoke<U, TAction>(U arg, [NotNull] TAction callback)
+    void IFunc<T, TResult>.Invoke<U, TAction>(U arg, TAction callback)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         callback.Invoke(this.callback(state, arg));

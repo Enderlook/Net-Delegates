@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Enderlook.Delegates;
 
@@ -22,7 +21,7 @@ public readonly struct StatedFuncWrapper<TState, T, TResult> : IFunc<T, TResult>
     /// <param name="state">State passed to the callback.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="callback"/> is <see langword="null"/>.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public StatedFuncWrapper([NotNull] Func<TState, T, TResult> callback, TState state)
+    public StatedFuncWrapper(Func<TState, T, TResult> callback, TState state)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         this.callback = callback;
@@ -35,7 +34,7 @@ public readonly struct StatedFuncWrapper<TState, T, TResult> : IFunc<T, TResult>
 
     /// <inheritdoc cref="IFunc{T, TResult}.Invoke{U, TAction}(U, TAction)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void IFunc<T, TResult>.Invoke<U, TAction>(U arg1, [NotNull] TAction callback)
+    void IFunc<T, TResult>.Invoke<U, TAction>(U arg1, TAction callback)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         callback.Invoke(this.callback(state, arg1));

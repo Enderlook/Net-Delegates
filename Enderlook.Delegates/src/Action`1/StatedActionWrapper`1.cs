@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Enderlook.Delegates;
 
@@ -33,7 +32,7 @@ public readonly struct StatedActionWrapper<TState, T> : IAction<T>
     /// <param name="state">State passed to the callback.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="callback"/> is <see langword="null"/>.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public StatedActionWrapper([NotNull] Action<TState, T> callback, TState state)
+    public StatedActionWrapper(Action<TState, T> callback, TState state)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         this.callback = callback;
