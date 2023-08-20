@@ -27,9 +27,9 @@ public readonly struct FuncWrapper<TResult> : IFunc<TResult>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TResult Invoke() => callback();
 
-    /// <inheritdoc cref="IFunc{TResult}.Invoke{TFunction}(TFunction)"/>
+    /// <inheritdoc cref="IFunc{TResult}.Invoke{TAction}(TAction)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void IFunc<TResult>.Invoke<TFunction>(TFunction callback)
+    void IFunc<TResult>.Invoke<TAction>(TAction callback)
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         callback.Invoke(this.callback());
