@@ -30,6 +30,26 @@ public interface IFunc<out TResult> : IDelegate
 #endif
         ;
 
+    /// <summary>
+    /// Executes this callback, and pass the return value to <paramref name="callback"/>.<br/>
+    /// This can be used to avoid boxing or improve devirtualization.
+    /// </summary>
+    /// <typeparam name="TFunc">Type of callback.</typeparam>
+    /// <typeparam name="TResult2">Type of callback result.</typeparam>
+    /// <param name="callback">Callback where return value is passed.</param>
+    /// <returns>Return value of <paramref name="callback"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="callback"/> is <see langword="null"/>.</exception>
+    public
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        virtual
+#endif
+        TResult2 Invoke<TFunc, TResult2>(TFunc callback)
+        where TFunc : IFunc<TResult, TResult2>
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        => callback.Invoke(Invoke())
+#endif
+        ;
+
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
     object? IDelegate.DynamicInvoke(params object?[]? args)

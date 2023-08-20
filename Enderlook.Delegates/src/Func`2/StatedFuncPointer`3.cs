@@ -57,4 +57,12 @@ public unsafe readonly struct StatedFuncPointer<TState, T, TResult> : IFunc<T, T
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         callback.Invoke(this.callback(state, arg));
     }
+
+    /// <inheritdoc cref="IFunc{T, TResult}.Invoke{U, TFunc, TResult2}(U, TFunc)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    TResult2 IFunc<T, TResult>.Invoke<U, TFunc, TResult2>(U arg, TFunc callback)
+    {
+        if (callback is null) Helper.ThrowArgumentNullException_Callback();
+        return callback.Invoke(this.callback(state, arg));
+    }
 }

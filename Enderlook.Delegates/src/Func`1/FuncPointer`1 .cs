@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Enderlook.Delegates;
 
@@ -33,6 +34,14 @@ public unsafe readonly struct FuncPointer<TResult> : IFunc<TResult>
     {
         if (callback is null) Helper.ThrowArgumentNullException_Callback();
         callback.Invoke(this.callback());
+    }
+
+    /// <inheritdoc cref="IFunc{TResult}.Invoke{TFunc, TResult2}(TFunc)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    TResult2 IFunc<TResult>.Invoke<TFunc, TResult2>(TFunc callback)
+    {
+        if (callback is null) Helper.ThrowArgumentNullException_Callback();
+        return callback.Invoke(this.callback());
     }
 
     /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>

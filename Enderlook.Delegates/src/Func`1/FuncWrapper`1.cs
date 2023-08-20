@@ -35,6 +35,14 @@ public readonly struct FuncWrapper<TResult> : IFunc<TResult>
         callback.Invoke(this.callback());
     }
 
+    /// <inheritdoc cref="IFunc{TResult}.Invoke{TFunc, TResult2}(TFunc)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    TResult2 IFunc<TResult>.Invoke<TFunc, TResult2>(TFunc callback)
+    {
+        if (callback is null) Helper.ThrowArgumentNullException_Callback();
+        return callback.Invoke(this.callback());
+    }
+
     /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     object? IDelegate.DynamicInvoke(params object?[]? args)
