@@ -36,6 +36,22 @@ public unsafe readonly struct StatedFuncPointer<TState, T1, T2, TResult> : IFunc
         where U2 : T2
         => callback(state, arg1, arg2);
 
+    /// <inheritdoc cref="IFunc{T1, T2, TResult}.Invoke{U1, U2, TAction}(U1, U2, TAction)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void IFunc<T1, T2, TResult>.Invoke<U1, U2, TAction>(U1 arg1, U2 arg2, TAction callback)
+    {
+        if (callback is null) Helper.ThrowArgumentNullException_Callback();
+        callback.Invoke(this.callback(state, arg1, arg2));
+    }
+
+    /// <inheritdoc cref="IFunc{T1, T2, TResult}.Invoke{U1, U2, TFunc, TResult2}(U1, U2, TFunc)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    TResult2 IFunc<T1, T2, TResult>.Invoke<U1, U2, TFunc, TResult2>(U1 arg1, U2 arg2, TFunc callback)
+    {
+        if (callback is null) Helper.ThrowArgumentNullException_Callback();
+        return callback.Invoke(this.callback(state, arg1, arg2));
+    }
+
     /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     object? IDelegate.DynamicInvoke(params object?[]? args)
@@ -53,20 +69,4 @@ public unsafe readonly struct StatedFuncPointer<TState, T1, T2, TResult> : IFunc
         return callback(state, arg1, arg2);
     }
 #endif
-
-    /// <inheritdoc cref="IFunc{T1, T2, TResult}.Invoke{U1, U2, TAction}(U1, U2, TAction)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void IFunc<T1, T2, TResult>.Invoke<U1, U2, TAction>(U1 arg1, U2 arg2, TAction callback)
-    {
-        if (callback is null) Helper.ThrowArgumentNullException_Callback();
-        callback.Invoke(this.callback(state, arg1, arg2));
-    }
-
-    /// <inheritdoc cref="IFunc{T1, T2, TResult}.Invoke{U1, U2, TFunc, TResult2}(U1, U2, TFunc)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    TResult2 IFunc<T1, T2, TResult>.Invoke<U1, U2, TFunc, TResult2>(U1 arg1, U2 arg2, TFunc callback)
-    {
-        if (callback is null) Helper.ThrowArgumentNullException_Callback();
-        return callback.Invoke(this.callback(state, arg1, arg2));
-    }
 }
