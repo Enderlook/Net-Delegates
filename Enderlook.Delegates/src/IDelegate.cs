@@ -10,7 +10,8 @@ public interface IDelegate
     /// <summary>
     /// Executes the delegate.
     /// </summary>
-    /// <param name="args">Argument passed to the delegate. Or <see langword="null"/>, if the delegate doesn't require arguments.</param>
+    /// <param name="args">Argument passed to the delegate.<br/>
+    /// If the delegate doesn't require arguments, it may be either <see langword="null"/> or an empty array.</param>
     /// <returns>Return value of the delegate.</returns>
     public abstract object? DynamicInvoke(params object?[]? args);
 
