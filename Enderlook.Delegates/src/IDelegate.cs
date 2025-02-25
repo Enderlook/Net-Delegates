@@ -14,6 +14,14 @@ public interface IDelegate
     /// <returns>Return value of the delegate.</returns>
     public abstract object? DynamicInvoke(params object?[]? args);
 
+    /// <summary>
+    /// Gets the signature of the delegate.<br/>
+    /// The first element is the return type of the delegate.<br/>
+    /// Subsequent elements are the parameters of the delegate.
+    /// </summary>
+    /// <returns>A description of the signature nof the delegate</returns>
+    public abstract Memory<Type> GetSignature();
+
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <summary>
     /// Executes the delegate.

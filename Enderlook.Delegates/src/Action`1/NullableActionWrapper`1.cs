@@ -36,6 +36,9 @@ public readonly struct NullableActionWrapper<T> : IAction<T>
         return null;
     }
 
+    /// <inheritdoc cref="IDelegate.GetSignature"/>
+    Memory<Type> IDelegate.GetSignature() => SignatureVoid<T>.Array;
+
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

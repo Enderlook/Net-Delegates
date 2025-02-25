@@ -52,6 +52,9 @@ public unsafe readonly struct FuncPointer<TResult> : IFunc<TResult>
         return callback();
     }
 
+    /// <inheritdoc cref="IDelegate.GetSignature"/>
+    Memory<Type> IDelegate.GetSignature() => Signature<TResult>.Array;
+
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

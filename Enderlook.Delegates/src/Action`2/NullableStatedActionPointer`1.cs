@@ -44,6 +44,9 @@ public unsafe readonly struct NullableStatedActionPointer<TState, T1, T2> : IAct
         }
     }
 
+    /// <inheritdoc cref="IDelegate.GetSignature"/>
+    Memory<Type> IDelegate.GetSignature() => SignatureVoid<T1, T2>.Array;
+
     /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     object? IDelegate.DynamicInvoke(params object?[]? args)

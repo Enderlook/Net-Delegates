@@ -56,6 +56,9 @@ public readonly struct FuncWrapper<T1, T2, TResult> : IFunc<T1, T2, TResult>
         return callback(arg1, arg2);
     }
 
+    /// <inheritdoc cref="IDelegate.GetSignature"/>
+    Memory<Type> IDelegate.GetSignature() => Signature<T1, T2, TResult>.Array;
+
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

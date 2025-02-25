@@ -56,6 +56,9 @@ public unsafe readonly struct StatedActionPointer<TState, T1, T2> : IAction<T1, 
         return null;
     }
 
+    /// <inheritdoc cref="IDelegate.GetSignature"/>
+    Memory<Type> IDelegate.GetSignature() => SignatureVoid<T1, T2>.Array;
+
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

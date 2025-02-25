@@ -6,6 +6,8 @@ namespace Enderlook.Delegates;
 
 internal static class Helper
 {
+    public static readonly Type[] VoidArray = [typeof(void)];
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void GetParameters(object?[]? args)
     {
@@ -95,4 +97,29 @@ internal static class Helper
     [DoesNotReturn]
     public static void ThrowArgumentNullException_Args()
         => throw new ArgumentNullException("args");
+}
+
+internal static class SignatureVoid<T>
+{
+    public static readonly Type[] Array = [typeof(void), typeof(T)];
+}
+
+internal static class SignatureVoid<T1, T2>
+{
+    public static readonly Type[] Array = [typeof(void), typeof(T1), typeof(T2)];
+}
+
+internal static class Signature<TResult>
+{
+    public static readonly Type[] Array = [typeof(TResult)];
+}
+
+internal static class Signature<T, TResult>
+{
+    public static readonly Type[] Array = [typeof(TResult), typeof(T)];
+}
+
+internal static class Signature<T1, T2, TResult>
+{
+    public static readonly Type[] Array = [typeof(TResult), typeof(T1), typeof(T2)];
 }

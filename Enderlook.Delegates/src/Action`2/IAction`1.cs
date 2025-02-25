@@ -27,6 +27,9 @@ public interface IAction<in T1, in T2> : IDelegate
         return null;
     }
 
+    /// <inheritdoc cref="IDelegate.GetSignature"/>
+    Memory<Type> IDelegate.GetSignature() => SignatureVoid<T1, T2>.Array;
+
     /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
     object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
     {

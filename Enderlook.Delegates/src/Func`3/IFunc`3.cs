@@ -78,6 +78,9 @@ public interface IFunc<in T1, in T2, out TResult> : IDelegate
         return Invoke(arg1, arg2);
     }
 
+    /// <inheritdoc cref="IDelegate.GetSignature"/>
+    Memory<Type> IDelegate.GetSignature() => Signature<T1, T2, TResult>.Array;
+
     /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
     object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
     {

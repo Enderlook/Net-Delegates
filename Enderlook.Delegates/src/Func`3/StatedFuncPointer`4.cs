@@ -60,6 +60,9 @@ public unsafe readonly struct StatedFuncPointer<TState, T1, T2, TResult> : IFunc
         return callback(state, arg1, arg2);
     }
 
+    /// <inheritdoc cref="IDelegate.GetSignature"/>
+    Memory<Type> IDelegate.GetSignature() => Signature<T1, T2, TResult>.Array;
+
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
