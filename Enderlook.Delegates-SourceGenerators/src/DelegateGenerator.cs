@@ -277,77 +277,35 @@ public void DynamicInvoke<THelper>(scoped ref THelper helper)
             [
                 new("ActionWrapper", "Helper.DelegateAction", [
                     (false, "Action", null, "value.callback", false),
-                    (false, "NullableActionWrapper", null, "new(value.callback)", false),
-                ], [("callback", null)], "Helper.VoidArray", 0, false),
-                new("NullableActionWrapper", null, [
-                    (false, "Action", null, "value.callback", false),
-                    (false, null, "Action", "new(value)", false),
                 ], [("callback", null)], "Helper.VoidArray", 0, false),
                 new("ActionPointer", "Helper.PointerAction", [
                     (false, "delegate* managed<void>", null, "value.callback", false),
-                    (false, "NullableActionPointer", null, "new(value.callback)", false),
                 ], null, "Helper.VoidArray", 0, false),
-                new("NullableActionPointer", null, [
-                    (false, "delegate* managed<void>", null, "value.callback", false),
-                    (false, null, "delegate* managed<void>", "new(value)", false),
-                ], null, "Helper.VoidArray", 0, false),
-                new("NullableStatedActionPointer<TState>", null, [], null, "Helper.VoidArray", 0, false),
-                new("NullableStatedActionWrapper<TState>", null, [], null, "Helper.VoidArray", 0, false),
                 new("StatedActionPointer<TState>", null, [
-                    (false, "NullableStatedActionPointer<TState>", null, "new(value.callback, value.state)", false),
                     ], null, "Helper.VoidArray", 0, false),
                 new("StatedActionWrapper<TState>", null, [
-                    (false, "NullableStatedActionWrapper<TState>", null, "new(value.callback, value.state)", false),
                     ], null, "Helper.VoidArray", 0, false),
 
                 new("ActionWrapper<T>", "SignatureVoid<T>.DelegateAction", [
                     (false, "Action<T>", null, "value.callback", false),
-                    (false, "NullableActionWrapper<T>", null, "new(value.callback)", false),
-                ], [("callback", null)], "SignatureVoid<T>.Array", 1, false),
-                new("NullableActionWrapper<T>", null, [
-                    (false, "Action<T>", null, "value.callback", false),
-                    (false, null, "Action<T>", "new(value)", false),
                 ], [("callback", null)], "SignatureVoid<T>.Array", 1, false),
                 new("ActionPointer<T>", "SignatureVoid<T>.PointerAction", [
                     (false, "delegate* managed<T, void>", null, "value.callback", false),
-                    (false, "NullableActionPointer<T>", null, "new(value.callback)", false),
                 ], null, "SignatureVoid<T>.Array", 1, false),
-                new("NullableActionPointer<T>", null, [
-                    (false, "delegate* managed<T, void>", null, "value.callback", false),
-                    (false, null, "delegate* managed<T, void>", "new(value)", false),
-                ], null, "SignatureVoid<T>.Array", 1, false),
-                new("NullableStatedActionPointer<TState, T>", null, [], null, "SignatureVoid<T>.Array", 1, false),
-                new("NullableStatedActionWrapper<TState, T>", null, [], null, "SignatureVoid<T>.Array", 1, false),
                 new("StatedActionPointer<TState, T>", null, [
-                    (false, "NullableStatedActionPointer<TState, T>", null, "new(value.callback, value.state)", false),
                     ], null, "SignatureVoid<T>.Array", 1, false),
                 new("StatedActionWrapper<TState, T>", null, [
-                    (false, "NullableStatedActionWrapper<TState, T>", null, "new(value.callback, value.state)", false),
                     ], null, "SignatureVoid<T>.Array", 1, false),
 
                 new("ActionWrapper<T1, T2>", "SignatureVoid<T1, T2>.DelegateAction", [
                     (false, "Action<T1, T2>", null, "value.callback", false),
-                    (false, "NullableActionWrapper<T1, T2>", null, "new(value.callback)", false),
-                ], [("callback", null)], "SignatureVoid<T1, T2>.Array", 2, false),
-                new("NullableActionWrapper<T1, T2>", null, [
-                    (false, "Action<T1, T2>", null, "value.callback", false),
-                    (false, null, "Action<T1, T2>", "new(value)", false),
                 ], [("callback", null)], "SignatureVoid<T1, T2>.Array", 2, false),
                 new("ActionPointer<T1, T2>", "SignatureVoid<T1, T2>.PointerAction", [
                     (false, "delegate* managed<T1, T2, void>", null, "value.callback", false),
-                    (false, "NullableActionPointer<T1, T2>", null, "new(value.callback)", false),
                 ], null, "SignatureVoid<T1, T2>.Array", 2, false),
-                new("NullableActionPointer<T1, T2>", null, [
-                    (false, "delegate* managed<T1, T2, void>", null, "value.callback", false),
-                    (false, null, "delegate* managed<T1, T2, void>", "new(value)", false),
-                ], null, "SignatureVoid<T1, T2>.Array", 2, false),
-                new("NullableStatedActionPointer<TState, T1, T2>", null, [], null, "SignatureVoid<T1, T2>.Array", 2, false),
-                new("NullableStatedActionWrapper<TState, T1, T2>", null, [], null, "SignatureVoid<T1, T2>.Array", 2, false),
                 new("StatedActionPointer<TState, T1, T2>", null, [
-                    (false, "NullableStatedActionPointer<TState, T1, T2>", null, "new(value.callback, value.state)", false),
                     ], null, "SignatureVoid<T1, T2>.Array", 2, false),
                 new("StatedActionWrapper<TState, T1, T2>", null, [
-                    (false, "NullableStatedActionWrapper<TState, T1, T2>", null, "new(value.callback, value.state)", false),
                     ], null, "SignatureVoid<T1, T2>.Array", 2, false),
 
                 new("FuncWrapper<TResult>", null, [
