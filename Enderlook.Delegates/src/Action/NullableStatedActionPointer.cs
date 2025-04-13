@@ -6,7 +6,7 @@ namespace Enderlook.Delegates;
 /// Wraps a <see langword="delegate* managed void"/> in order to implement <see cref="IAction"/>.
 /// </summary>
 /// <typeparam name="TState">Type of state.</typeparam>
-public unsafe readonly struct NullableStatedActionPointer<TState> : IAction
+public unsafe readonly partial struct NullableStatedActionPointer<TState> : IAction
 {
     private readonly delegate* managed<TState, void> callback;
     private readonly TState state;
@@ -15,7 +15,11 @@ public unsafe readonly struct NullableStatedActionPointer<TState> : IAction
     /// Wraps a dummy callback which does nothing.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NullableStatedActionPointer() => state = default!;
+    public NullableStatedActionPointer()
+    {
+        callback = default;
+        state = default!;
+    }
 
     /// <summary>
     /// Wraps an <paramref name="callback"/>.
@@ -38,40 +42,4 @@ public unsafe readonly struct NullableStatedActionPointer<TState> : IAction
         if (callback is not null)
             callback(state);
     }
-
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicInvoke(params object?[]? args)
-    {
-        Helper.GetParameters(args);
-        delegate*<TState, void> callback = this.callback;
-        if (callback is not null)
-            callback(state);
-        return null;
-    }
-
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    Memory<Type> IDelegate.GetSignature() => Helper.VoidArray;
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
-    {
-        Helper.GetParameters(args);
-        delegate*<TState, void> callback = this.callback;
-        if (callback is not null)
-            callback(state);
-        return null;
-    }
-#endif
-
-    /// <summary>
-    /// Cast a non nullable callback into a nullable one.
-    /// </summary>
-    /// <param name="callback">Callback to cast.</param>
-    /// <returns>Casted callback.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator NullableStatedActionPointer<TState>(StatedActionPointer<TState> callback) => new(callback.callback, callback.state);
 }

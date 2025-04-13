@@ -6,7 +6,10 @@ namespace Enderlook.Delegates;
 /// Wraps a <see langword="delegate* managed T void"/> in order to implement <see cref="IAction{T}"/>.
 /// </summary>
 /// <typeparam name="T">Type of parameter.</typeparam>
-public unsafe readonly struct NullableActionPointer<T> : IAction<T>
+public unsafe readonly partial struct NullableActionPointer<T> : IAction<T>
+#if NET9_0_OR_GREATER
+    where T: allows ref struct
+#endif
 {
     private readonly delegate* managed<T, void> callback;
 
@@ -23,64 +26,12 @@ public unsafe readonly struct NullableActionPointer<T> : IAction<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NullableActionPointer(delegate* managed<T, void> callback) => this.callback = callback;
 
-    /// <inheritdoc cref="IAction{T}.Invoke{U}(U)"/>
+    /// <inheritdoc cref="IAction{T}.Invoke(T)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Invoke<U>(U arg)
-        where U : T
+    public void Invoke(T arg)
     {
         delegate*<T, void> callback = this.callback;
         if (callback is not null)
             callback(arg);
     }
-
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicInvoke(params object?[]? args)
-    {
-        Helper.GetParameters(args, out T arg);
-        delegate*<T, void> callback = this.callback;
-        if (callback is not null)
-            callback(arg);
-        return null;
-    }
-
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    Memory<Type> IDelegate.GetSignature() => SignatureVoid<T>.Array;
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
-    {
-        Helper.GetParameters(args, out T arg);
-        delegate*<T, void> callback = this.callback;
-        if (callback is not null)
-            callback(arg);
-        return null;
-    }
-#endif
-
-    /// <summary>
-    /// Extract the wrapped callback.
-    /// </summary>
-    /// <param name="callback">Wrapper to open.</param>
-    /// <returns>Wrapped callback.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator delegate* managed<T, void>(NullableActionPointer<T> callback) => callback.callback;
-
-    /// <summary>
-    /// Wrap an callback.
-    /// </summary>
-    /// <param name="callback">Callback to wrap.</param>
-    /// <returns>Wrapper of callback..</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator NullableActionPointer<T>(delegate* managed<T, void> callback) => new(callback);
-
-    /// <summary>
-    /// Cast a non nullable callback into a nullable one.
-    /// </summary>
-    /// <param name="callback">Callback to cast.</param>
-    /// <returns>Casted callback.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator NullableActionPointer<T>(ActionPointer<T> callback) => new(callback.callback);
 }

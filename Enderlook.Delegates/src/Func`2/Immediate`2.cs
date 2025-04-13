@@ -7,9 +7,12 @@ namespace Enderlook.Delegates;
 /// </summary>
 /// <typeparam name="T">Type of parameter.</typeparam>
 /// <typeparam name="TResult">Type of return value.</typeparam>
-public unsafe readonly struct Immediate<T, TResult> : IFunc<T, TResult>
+public unsafe readonly partial struct Immediate<T, TResult> : IFunc<T, TResult>
+#if NET9_0_OR_GREATER
+    where T : allows ref struct
+#endif
 {
-    private readonly TResult value;
+    internal readonly TResult value;
 
     /// <summary>
     /// Wraps an <paramref name="value"/>.
@@ -18,60 +21,7 @@ public unsafe readonly struct Immediate<T, TResult> : IFunc<T, TResult>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Immediate(TResult value) => this.value = value;
 
-    /// <inheritdoc cref="IFunc{T, TResult}.Invoke{U}(U)"/>
+    /// <inheritdoc cref="IFunc{T, TResult}.Invoke(T)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TResult Invoke<U>(U arg) where U : T => value;
-
-    /// <inheritdoc cref="IFunc{T, TResult}.Invoke{U, TAction}(U, TAction)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void IFunc<T, TResult>.Invoke<U, TAction>(U arg, TAction callback)
-    {
-        if (callback is null) Helper.ThrowArgumentNullException_Callback();
-        callback.Invoke(value);
-    }
-
-    /// <inheritdoc cref="IFunc{T, TResult}.Invoke{U, TFunc, TResult2}(U, TFunc)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    TResult2 IFunc<T, TResult>.Invoke<U, TFunc, TResult2>(U arg, TFunc callback)
-    {
-        if (callback is null) Helper.ThrowArgumentNullException_Callback();
-        return callback.Invoke(value);
-    }
-
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicInvoke(params object?[]? args)
-    {
-        Helper.GetParameters(args, out T _);
-        return value;
-    }
-
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    Memory<Type> IDelegate.GetSignature() => Signature<T, TResult>.Array;
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
-    {
-        Helper.GetParameters(args, out T _);
-        return value;
-    }
-#endif
-
-    /// <summary>
-    /// Extract the wrapped value.
-    /// </summary>
-    /// <param name="callback">Wrapper to open.</param>
-    /// <returns>Wrapped value.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator TResult(Immediate<T, TResult> callback) => callback.value;
-
-    /// <summary>
-    /// Wrap a value.
-    /// </summary>
-    /// <param name="value">Value to wrap.</param>
-    /// <returns>Wrapper of value.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Immediate<T, TResult>(TResult value) => new(value);
+    public TResult Invoke(T arg) => value;
 }

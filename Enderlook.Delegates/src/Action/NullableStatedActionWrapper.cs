@@ -6,7 +6,7 @@ namespace Enderlook.Delegates;
 /// Wraps a <see cref="Action{T}"/> in order to implement <see cref="IAction"/>.
 /// </summary>
 /// <typeparam name="TState">Type of state.</typeparam>
-public readonly struct NullableStatedActionWrapper<TState> : IAction
+public readonly partial struct NullableStatedActionWrapper<TState> : IAction
 {
     private readonly Action<TState>? callback;
     private readonly TState state;
@@ -15,7 +15,11 @@ public readonly struct NullableStatedActionWrapper<TState> : IAction
     /// Wraps a dummy callback which does nothing.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NullableStatedActionWrapper() => state = default!;
+    public NullableStatedActionWrapper()
+    {
+        callback = default;
+        state = default!;
+    }
 
     /// <summary>
     /// Wraps an <paramref name="callback"/>.
@@ -33,36 +37,4 @@ public readonly struct NullableStatedActionWrapper<TState> : IAction
     /// <inheritdoc cref="IAction.Invoke"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Invoke() => callback?.Invoke(state);
-
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicInvoke(params object?[]? args)
-    {
-        Helper.GetParameters(args);
-        callback?.Invoke(state);
-        return null;
-    }
-
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    Memory<Type> IDelegate.GetSignature() => Helper.VoidArray;
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
-    {
-        Helper.GetParameters(args);
-        callback?.Invoke(state);
-        return null;
-    }
-#endif
-
-    /// <summary>
-    /// Cast a non nullable callback into a nullable one.
-    /// </summary>
-    /// <param name="callback">Callback to cast.</param>
-    /// <returns>Casted callback.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator NullableStatedActionWrapper<TState>(StatedActionWrapper<TState> callback) => new(callback.callback, callback.state);
 }

@@ -7,7 +7,7 @@ namespace Enderlook.Delegates;
 /// </summary>
 /// <typeparam name="TState">Type of state.</typeparam>
 /// <remarks>This type must always be constructed, calling any method on <see langword="default"/> is an error.</remarks>
-public unsafe readonly struct StatedActionPointer<TState> : IAction
+public unsafe readonly partial struct StatedActionPointer<TState> : IAction
 {
     internal readonly delegate* managed<TState, void> callback;
     internal readonly TState state;
@@ -18,12 +18,9 @@ public unsafe readonly struct StatedActionPointer<TState> : IAction
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public StatedActionPointer()
     {
-        callback = &Dummy;
+        callback = SignatureVoid<TState>.PointerAction;
         state = default!;
     }
-
-    private static void Dummy(TState state) { }
-
     /// <summary>
     /// Wraps an <paramref name="callback"/>.
     /// </summary>
@@ -41,28 +38,4 @@ public unsafe readonly struct StatedActionPointer<TState> : IAction
     /// <inheritdoc cref="IAction.Invoke"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Invoke() => callback(state);
-
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicInvoke(params object?[]? args)
-    {
-        Helper.GetParameters(args);
-        callback(state);
-        return null;
-    }
-
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    Memory<Type> IDelegate.GetSignature() => Helper.VoidArray;
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
-    {
-        Helper.GetParameters(args);
-        callback(state);
-        return null;
-    }
-#endif
 }

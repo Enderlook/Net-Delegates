@@ -5,32 +5,34 @@
 /// </summary>
 /// <typeparam name="T">Type of the parameter.</typeparam>
 public interface IAction<in T> : IDelegate
+#if NET9_0_OR_GREATER
+    where T : allows ref struct
+#endif
 {
     /// <summary>
     /// Executes this callback.
     /// </summary>
     /// <param name="arg">Argument to pass as parameter.</param>
-    /// <typeparam name="U">Specialized type of <typeparamref name="T"/>, useful to avoid boxing or improve devirtualization.</typeparam>
-    public abstract void Invoke<U>(U arg) where U : T;
+    /// Take into account that if <typeparamref name="T"/> is not a by ref type (<see langword="ref"/> <see langword="struct"/>), then <typeparamref name="U"/> is not guaranted to support one that is.</typeparam>
+    public void Invoke(T arg);
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    object? IDelegate.DynamicInvoke(params object?[]? args)
+    /// <inheritdoc cref="IDelegate.GetDynamicSignature"/>
+    ReadOnlySpan<Type> IDelegate.GetDynamicSignature() => SignatureVoid<T>.Array;
+
+    /// <inheritdoc cref="IDelegate.SupportsInvocationHelper{THelper}(in THelper)"/>
+    bool IDelegate.SupportsInvocationHelper<THelper>(in THelper helper)
     {
-        Helper.GetParameters(args, out T arg1);
-        Invoke(arg1);
-        return null;
+        return helper.ParametersCount == 1
+            && helper.AcceptsParameterType(0, typeof(T))
+            && (!helper.AcceptsReturn || helper.AcceptsReturnType(typeof(object)));
     }
 
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    Memory<Type> IDelegate.GetSignature() => SignatureVoid<T>.Array;
-
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{T}(T)"/>
-    object? IDelegate.DynamicTupleInvoke<U>(U args)
+    /// <inheritdoc cref="IDelegate.DynamicInvoke{THelper}(ref THelper)"/>
+    void IDelegate.DynamicInvoke<THelper>(scoped ref THelper helper)
     {
-        Helper.GetParameters(args, out T arg1);
-        Invoke(arg1);
-        return null;
+        Invoke(helper.GetParameter<T>(0));
+        helper.SetResult(default(object));
     }
 #endif
 }

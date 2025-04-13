@@ -11,23 +11,21 @@ public interface IAction : IDelegate
     public abstract void Invoke();
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    object? IDelegate.DynamicInvoke(params object?[]? args)
+    /// <inheritdoc cref="IDelegate.GetDynamicSignature"/>
+    ReadOnlySpan<Type> IDelegate.GetDynamicSignature() => Helper.VoidArray;
+
+    /// <inheritdoc cref="IDelegate.SupportsInvocationHelper{THelper}(in THelper)"/>
+    bool IDelegate.SupportsInvocationHelper<THelper>(in THelper helper)
     {
-        Helper.GetParameters(args);
-        Invoke();
-        return null;
+        return helper.ParametersCount == 0
+            && (!helper.AcceptsReturn || helper.AcceptsReturnType(typeof(object)));
     }
 
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    Memory<Type> IDelegate.GetSignature() => Helper.VoidArray;
-
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    /// <inheritdoc cref="IDelegate.DynamicInvoke{THelper}(ref THelper)"/>
+    void IDelegate.DynamicInvoke<THelper>(scoped ref THelper helper)
     {
-        Helper.GetParameters(args);
         Invoke();
-        return null;
+        helper.SetResult(default(object));
     }
 #endif
 }

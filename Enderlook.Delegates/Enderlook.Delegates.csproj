@@ -30,5 +30,9 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
     <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Enderlook.Delegates-SourceGenerators\Enderlook.Delegates-SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
 	
 </Project>

@@ -6,75 +6,34 @@
 /// <typeparam name="T">Type of the parameter.</typeparam>
 /// <typeparam name="TResult">Type of return value.</typeparam>
 public interface IFunc<in T, out TResult> : IDelegate
+#if NET9_0_OR_GREATER
+    where T : allows ref struct
+    where TResult : allows ref struct
+#endif
 {
     /// <summary>
     /// Executes this callback.
     /// </summary>
     /// <param name="arg">Argument to pass as parameter.</param>
-    /// <typeparam name="U">Specialized type of <typeparamref name="T"/>, useful to avoid boxing or improve inlining in value types.</typeparam>
     /// <returns>Return value of the callback.</returns>
-    public abstract TResult Invoke<U>(U arg) where U : T;
-
-    /// <summary>
-    /// Executes this callback, and pass the return value to <paramref name="callback"/>.<br/>
-    /// This can be used to avoid boxing or improve devirtualization.
-    /// </summary>
-    /// <typeparam name="U">Specialized type of <typeparamref name="T"/>, useful to avoid boxing or improve inlining in value types.</typeparam>
-    /// <typeparam name="TAction">Type of callback.</typeparam>
-    /// <param name="arg">Argument to pass as parameter.</param>
-    /// <param name="callback">Callback where return value is passed.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="callback"/> is <see langword="null"/>.</exception>
-    public
-#if NET5_0_OR_GREATER || NETSTANDARD2__OR_GREATER
-        virtual
-#endif
-        void Invoke<U, TAction>(U arg, TAction callback)
-        where U : T
-        where TAction : IAction<TResult>
-#if NET5_0_OR_GREATER || NETSTANDARD2__OR_GREATER
-        => callback.Invoke(Invoke(arg))
-#endif
-        ;
-
-    /// <summary>
-    /// Executes this callback, and pass the return value to <paramref name="callback"/>.<br/>
-    /// This can be used to avoid boxing or improve devirtualization.
-    /// </summary>
-    /// <typeparam name="U">Specialized type of <typeparamref name="T"/>, useful to avoid boxing or improve inlining in value types.</typeparam>
-    /// <typeparam name="TFunc">Type of callback.</typeparam>
-    /// <typeparam name="TResult2">Type of callback result.</typeparam>
-    /// <param name="arg">Argument to pass as parameter.</param>
-    /// <param name="callback">Callback where return value is passed.</param>
-    /// <returns>Return value of <paramref name="callback"/>.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="callback"/> is <see langword="null"/>.</exception>
-    public
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        virtual
-#endif
-        TResult2 Invoke<U, TFunc, TResult2>(U arg, TFunc callback)
-        where U : T
-        where TFunc : IFunc<TResult, TResult2>
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        => callback.Invoke(Invoke(arg))
-#endif
-        ;
+    public abstract TResult Invoke(T arg);
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    object? IDelegate.DynamicInvoke(params object?[]? args)
+    /// <inheritdoc cref="IDelegate.GetDynamicSignature"/>
+    ReadOnlySpan<Type> IDelegate.GetDynamicSignature() => Signature<TResult>.Array;
+
+    /// <inheritdoc cref="IDelegate.SupportsInvocationHelper{THelper}(in THelper)"/>
+    bool IDelegate.SupportsInvocationHelper<THelper>(in THelper helper)
     {
-        Helper.GetParameters(args, out T arg);
-        return Invoke(arg);
+        return helper.ParametersCount == 1
+            && helper.AcceptsParameterType(0, typeof(T))
+            && helper.AcceptsReturnType(typeof(TResult));
     }
 
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    Memory<Type> IDelegate.GetSignature() => Signature<T, TResult>.Array;
-
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
+    /// <inheritdoc cref="IDelegate.DynamicInvoke{THelper}(ref THelper)"/>
+    void IDelegate.DynamicInvoke<THelper>(scoped ref THelper helper)
     {
-        Helper.GetParameters(args, out T arg);
-        return Invoke(arg);
+        helper.SetResult(Invoke(helper.GetParameter<T>(0)));
     }
 #endif
 }

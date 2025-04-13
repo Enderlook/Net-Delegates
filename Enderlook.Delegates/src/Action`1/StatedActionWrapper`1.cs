@@ -8,10 +8,11 @@ namespace Enderlook.Delegates;
 /// <typeparam name="TState">Type of state.</typeparam>
 /// <typeparam name="T">Type of parameter.</typeparam>
 /// <remarks>This type must always be constructed, calling any method on <see langword="default"/> is an error.</remarks>
-public readonly struct StatedActionWrapper<TState, T> : IAction<T>
+public readonly partial struct StatedActionWrapper<TState, T> : IAction<T>
+#if NET9_0_OR_GREATER
+    where T: allows ref struct
+#endif
 {
-    private static readonly Action<TState, T> Shared = new((state, arg) => { });
-
     internal readonly Action<TState, T> callback;
     internal readonly TState state;
 
@@ -21,7 +22,7 @@ public readonly struct StatedActionWrapper<TState, T> : IAction<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public StatedActionWrapper()
     {
-        callback = Shared;
+        callback = SignatureVoid<TState, T>.DelegateAction;
         state = default!;
     }
 
@@ -39,30 +40,7 @@ public readonly struct StatedActionWrapper<TState, T> : IAction<T>
         this.state = state;
     }
 
-    /// <inheritdoc cref="IAction{T}.Invoke{U}(U)"/>
+    /// <inheritdoc cref="IAction{T}.Invoke(T)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Invoke<U>(U arg) where U : T => callback(state, arg);
-
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicInvoke(params object?[]? args)
-    {
-        Helper.GetParameters(args, out T arg);
-        callback(state, arg);
-        return null;
-    }
-
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    Memory<Type> IDelegate.GetSignature() => SignatureVoid<T>.Array;
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
-    {
-        Helper.GetParameters(args, out T arg);
-        callback(state, arg);
-        return null;
-    }
-#endif
+    public void Invoke(T arg) => callback(state, arg);
 }

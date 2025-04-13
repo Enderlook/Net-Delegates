@@ -3,14 +3,12 @@
 namespace Enderlook.Delegates;
 
 /// <summary>
-/// Wraps a <see cref="Action{T1}"/> in order to implement <see cref="IAction"/>.
+/// Wraps a <see cref="Action{T}"/> in order to implement <see cref="IAction"/>.
 /// </summary>
 /// <typeparam name="TState">Type of state.</typeparam>
 /// <remarks>This type must always be constructed, calling any method on <see langword="default"/> is an error.</remarks>
-public readonly struct StatedActionWrapper<TState> : IAction
+public readonly partial struct StatedActionWrapper<TState> : IAction
 {
-    private static readonly Action<TState> Shared = new(state => { });
-
     internal readonly Action<TState> callback;
     internal readonly TState state;
 
@@ -20,7 +18,7 @@ public readonly struct StatedActionWrapper<TState> : IAction
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public StatedActionWrapper()
     {
-        callback = Shared;
+        callback = SignatureVoid<TState>.DelegateAction;
         state = default!;
     }
 
@@ -41,28 +39,4 @@ public readonly struct StatedActionWrapper<TState> : IAction
     /// <inheritdoc cref="IAction.Invoke"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Invoke() => callback(state);
-
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicInvoke(params object?[]? args)
-    {
-        Helper.GetParameters(args);
-        callback(state);
-        return null;
-    }
-
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    Memory<Type> IDelegate.GetSignature() => Helper.VoidArray;
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
-    {
-        Helper.GetParameters(args);
-        callback(state);
-        return null;
-    }
-#endif
 }

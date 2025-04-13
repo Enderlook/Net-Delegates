@@ -8,7 +8,10 @@ namespace Enderlook.Delegates;
 /// <typeparam name="TState">Type of state.</typeparam>
 /// <typeparam name="T">Type of parameter.</typeparam>
 /// <remarks>This type must always be constructed, calling any method on <see langword="default"/> is an error.</remarks>
-public unsafe readonly struct StatedActionPointer<TState, T> : IAction<T>
+public unsafe readonly partial struct StatedActionPointer<TState, T> : IAction<T>
+#if NET9_0_OR_GREATER
+    where T: allows ref struct
+#endif
 {
     internal readonly delegate* managed<TState, T, void> callback;
     internal readonly TState state;
@@ -19,12 +22,9 @@ public unsafe readonly struct StatedActionPointer<TState, T> : IAction<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public StatedActionPointer()
     {
-        callback = &Dummy;
+        callback = SignatureVoid<TState, T>.PointerAction;
         state = default!;
     }
-
-    private static void Dummy(TState state, T arg) { }
-
     /// <summary>
     /// Wraps an <paramref name="callback"/>.
     /// </summary>
@@ -39,30 +39,7 @@ public unsafe readonly struct StatedActionPointer<TState, T> : IAction<T>
         this.state = state;
     }
 
-    /// <inheritdoc cref="IAction{T}.Invoke{U}(U)"/>
+    /// <inheritdoc cref="IAction{T}.Invoke(T)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Invoke<U>(U arg) where U : T => callback(state, arg);
-
-    /// <inheritdoc cref="IDelegate.DynamicInvoke(object[])"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicInvoke(params object?[]? args)
-    {
-        Helper.GetParameters(args, out T arg);
-        callback(state, arg);
-        return null;
-    }
-
-    /// <inheritdoc cref="IDelegate.GetSignature"/>
-    Memory<Type> IDelegate.GetSignature() => SignatureVoid<T>.Array;
-
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    /// <inheritdoc cref="IDelegate.DynamicTupleInvoke{TTuple}(TTuple)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    object? IDelegate.DynamicTupleInvoke<TTuple>(TTuple args)
-    {
-        Helper.GetParameters(args, out T arg);
-        callback(state, arg);
-        return null;
-    }
-#endif
+    public void Invoke(T arg) => callback(state, arg);
 }
