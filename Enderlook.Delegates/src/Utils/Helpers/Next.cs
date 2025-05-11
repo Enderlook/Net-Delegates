@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Enderlook.Delegates.Builder;
+namespace Enderlook.Delegates.InvocationHelpers;
 
 /// <summary>
 /// Represent the next argument of a delegate invocation helper builder.
@@ -11,11 +11,11 @@ public readonly
 #if NET9_0_OR_GREATER
     ref
 #endif
-    struct DelegateInvocationHelperBuilderNext<TPrevious, TValue> : IDelegateInvocationHelperParameterBuilder
+    struct Next<TPrevious, TValue> : IArgumentsBuilder
 #if NET9_0_OR_GREATER
-    where TPrevious : IDelegateInvocationHelperParameterBuilder, allows ref struct
+    where TPrevious : IArgumentsBuilder, allows ref struct
 #else
-    where TPrevious: IDelegateInvocationHelperParameterBuilder
+    where TPrevious: IArgumentsBuilder
 #endif
 #if NET9_0_OR_GREATER
     where TValue : allows ref struct
@@ -25,36 +25,34 @@ public readonly
     private readonly TPrevious previous;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal DelegateInvocationHelperBuilderNext(TPrevious previous, TValue next)
+    internal Next(TPrevious previous, TValue next)
     {
         this.next = next;
         this.previous = previous;
     }
 
-    readonly int IDelegateInvocationHelperParameterBuilder.ParametersCount
+    readonly int IArgumentsBuilder.ParametersCount
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => 1 + previous.ParametersCount;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    readonly T IDelegateInvocationHelperParameterBuilder.GetParameter<T>(int i)
+    readonly T IArgumentsBuilder.GetParameter<T>(int i)
     {
-        if (i == 0)
-            return CasterHelper<TValue, T>.Cast(next);
+        if (i == 0) return CasterHelper<TValue, T>.Cast(next);
         return previous.GetParameter<T>(i - 1);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    readonly T? IDelegateInvocationHelperParameterBuilder.TryGetParameter<T>(int i, out bool can) where T: default
+    readonly T? IArgumentsBuilder.TryGetParameter<T>(int i, out bool can) where T: default
     {
-        if (i == 0)
-            return CasterHelper<TValue?, T?>.TryCast(this.next, out can);
+        if (i == 0) return CasterHelper<TValue?, T?>.TryCast(this.next, out can);
         return previous.TryGetParameter<T>(i - 1, out can);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    readonly bool IDelegateInvocationHelperParameterBuilder.AcceptsParameterType(int i, Type type)
+    readonly bool IArgumentsBuilder.AcceptsParameterType(int i, Type type)
     {
         if (i == 0)
         {

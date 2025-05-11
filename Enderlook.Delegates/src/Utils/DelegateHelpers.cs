@@ -1,4 +1,4 @@
-﻿using Enderlook.Delegates.Builder;
+﻿using Enderlook.Delegates.InvocationHelpers;
 
 using System.Runtime.CompilerServices;
 
@@ -95,83 +95,139 @@ public static class DelegateHelpers
     }
 
     /// <summary>
-    /// Creates an instance of an invocation helper that doesn't have parameters not accepts a return value.
+    /// Creates an instance of a delegate invocation helper builder that doesn't have parameters nor accepts a return value.
     /// </summary>
-    /// <returns>New instance.</returns>
+    /// <returns>New builder instance.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static NoArgumentsInvocationHelper WithoutReturn() => new();
+    public static VoidBuilder Builder() => new();
 
     /// <summary>
-    /// Creates an instance of an invocation helper that doesn't have parameters and accepts a return value.
+    /// Make the delegate invocation helper builder to accept a return value.
     /// </summary>
-    /// <returns>New instance.</returns>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <returns>New builder instance.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static NoArgumentsInvocationHelper<TResult> WithReturn<TResult>()
+    public static ReturnBuilder<TResult> WithReturn<TResult>(this VoidBuilder builder)
 #if NET9_0_OR_GREATER
         where TResult : allows ref struct
 #endif
         => new();
 
     /// <summary>
-    /// Creates a builder for a delegate invocation helper and set the first argument.
+    /// Make the delegate invocation helper to have a parameter.
     /// </summary>
-    /// <typeparam name="TArg">Type of the first argument.</typeparam>
-    /// <param name="argument">Value of the first argument.</param>
-    /// <returns>New builder.</returns>
+    /// <typeparam name="TArgument">Type of the argument.</typeparam>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <param name="arg">Argument to include.</param>
+    /// <returns>New builder instance.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static DelegateInvocationHelperBuilderValue<TArg> WithArgument<TArg>(TArg argument)
+    public static VoidBuilder<Value<TArgument>> WithArgument<TArgument>(this VoidBuilder builder, TArgument arg)
 #if NET9_0_OR_GREATER
-        where TArg : allows ref struct
+        where TArgument : allows ref struct
 #endif
-        => new(argument);
+        => new(new(arg));
 
     /// <summary>
-    /// Chains the following argument to the builder of the delegate invocation helper.
+    /// Make the delegate invocation helper to have another parameter.
     /// </summary>
-    /// <typeparam name="TArgs">Type of current builder.</typeparam>
-    /// <typeparam name="TArg">Type of the new argument.</typeparam>
-    /// <param name="previous">Current builder.</param>
-    /// <param name="next">Value of the next argument.</param>
-    /// <returns>New builder with the additional argument.</returns>
+    /// <typeparam name="TArguments">Type that contains the arguments.</typeparam>
+    /// <typeparam name="TArgument">Type of the argument.</typeparam>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <param name="arg">Argument to include.</param>
+    /// <returns>New builder instance.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static DelegateInvocationHelperBuilderNext<TArgs, TArg> NextArgument<TArgs, TArg>(this TArgs previous, TArg next)
+    public static VoidBuilder<Next<TArguments, TArgument>> WithArgument<TArguments, TArgument>(this VoidBuilder<TArguments> builder, TArgument arg)
 #if NET9_0_OR_GREATER
-        where TArgs : IDelegateInvocationHelperParameterBuilder, allows ref struct
-        where TArg : allows ref struct
+        where TArguments : IArgumentsBuilder, allows ref struct
+        where TArgument : allows ref struct
 #else
-        where TArgs : IDelegateInvocationHelperParameterBuilder
+        where TArguments : IArgumentsBuilder
 #endif
-        => new(previous, next);
+        => new(new(builder.arguments, arg));
 
     /// <summary>
-    /// Completes the delegate invocation helper builder with a return value.
+    /// Make the delegate invocation helper to have a parameter.
     /// </summary>
-    /// <typeparam name="TArgs">Type of current builder.</typeparam>
-    /// <typeparam name="TResult">Type of the return value</typeparam>
-    /// <param name="arguments">Current builder.</param>
-    /// <returns>New completed delegate invocation helper.</returns>
+    /// <typeparam name="TArgument">Type of the argument.</typeparam>
+    /// <typeparam name="TResult">Type of return value.</typeparam>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <param name="arg">Argument to include.</param>
+    /// <returns>New builder instance.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static DelegateInvocationHelper<TArgs, TResult> WithResult<TArgs, TResult>(this TArgs arguments)
+    public static ReturnBuilder<Value<TArgument>, TResult> WithArgument<TArgument, TResult>(this ReturnBuilder<TResult> builder, TArgument arg)
 #if NET9_0_OR_GREATER
-        where TArgs : IDelegateInvocationHelperParameterBuilder, allows ref struct
+        where TArgument : allows ref struct
+        where TResult : allows ref struct
+#endif
+        => new(new(arg));
+
+    /// <summary>
+    /// Make the delegate invocation helper to have another parameter.
+    /// </summary>
+    /// <typeparam name="TArguments">Type that contains the arguments.</typeparam>
+    /// <typeparam name="TArgument">Type of the argument.</typeparam>
+    /// <typeparam name="TResult">Type of return value.</typeparam>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <param name="arg">Argument to include.</param>
+    /// <returns>New builder instance.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReturnBuilder<Next<TArguments, TArgument>, TResult> WithArgument<TArguments, TArgument, TResult>(this ReturnBuilder<TArguments, TResult> builder, TArgument arg)
+#if NET9_0_OR_GREATER
+        where TArguments : IArgumentsBuilder, allows ref struct
+        where TArgument : allows ref struct
         where TResult : allows ref struct
 #else
-        where TArgs : IDelegateInvocationHelperParameterBuilder
+        where TArguments : IArgumentsBuilder
 #endif
-        => new(arguments);
+        => new(new(builder.arguments, arg));
 
     /// <summary>
-    /// Completes the delegate invocation helper builder with a return value.
+    /// Completes the construction of the delegate invocation helper.
     /// </summary>
-    /// <typeparam name="TArgs">Type of current builder.</typeparam>
-    /// <param name="arguments">Current builder.</param>
-    /// <returns>New completed delegate invocation helper.</returns>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <returns>New constructed delegate invocation helper.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static DelegateInvocationHelper<TArgs> WithoutResult<TArgs>(this TArgs arguments)
+    public static VoidHelper Build(this VoidBuilder builder)
+        => new();
+
+    /// <summary>
+    /// Completes the construction of the delegate invocation helper.
+    /// </summary>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <returns>New constructed delegate invocation helper.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static VoidHelper<TArguments> Build<TArguments>(this VoidBuilder<TArguments> builder)
 #if NET9_0_OR_GREATER
-        where TArgs : IDelegateInvocationHelperParameterBuilder, allows ref struct
+        where TArguments : IArgumentsBuilder, allows ref struct
 #else
-        where TArgs : IDelegateInvocationHelperParameterBuilder
+        where TArguments : IArgumentsBuilder
 #endif
-        => new(arguments);
+        => new(builder.arguments);
+
+    /// <summary>
+    /// Completes the construction of the delegate invocation helper.
+    /// </summary>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <returns>New constructed delegate invocation helper.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReturnHelper<TResult> Build<TResult>(this ReturnBuilder<TResult> builder)
+#if NET9_0_OR_GREATER
+        where TResult : allows ref struct
+#endif
+        => new();
+
+    /// <summary>
+    /// Completes the construction of the delegate invocation helper.
+    /// </summary>
+    /// <param name="builder">Current delegate invocation helper builder to base from.</param>
+    /// <returns>New constructed delegate invocation helper.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ReturnHelper<TArguments, TResult> Build<TArguments, TResult>(this ReturnBuilder<TArguments, TResult> builder)
+#if NET9_0_OR_GREATER
+        where TArguments : IArgumentsBuilder, allows ref struct
+        where TResult : allows ref struct
+#else
+        where TArguments : IArgumentsBuilder
+#endif
+        => new(builder.arguments);
 }

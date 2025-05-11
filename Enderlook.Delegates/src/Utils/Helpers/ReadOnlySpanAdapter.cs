@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Enderlook.Delegates.Builder;
+namespace Enderlook.Delegates.InvocationHelpers;
 
 #if NET9_0_OR_GREATER
 internal ref struct ReadOnlySpanAdapter<TResult>(ReadOnlySpan<object?> args) : ISafeDelegateInvocationHelper

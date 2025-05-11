@@ -1,33 +1,37 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
-namespace Enderlook.Delegates.Builder;
+namespace Enderlook.Delegates.InvocationHelpers;
 
 /// <summary>
 /// Represent a builded delegate invocation helper.
 /// </summary>
-/// <typeparam name="TContent">Type that contains the parameters.</typeparam>
+/// <typeparam name="TArguments">Type that contains the arguments.</typeparam>
+/// <typeparam name="TResult">Type of return.</typeparam>
 public
 #if NET9_0_OR_GREATER
     ref
 #endif
-    struct DelegateInvocationHelper<TContent> : ISafeDelegateInvocationHelper
+    struct ReturnHelper<TArguments, TResult> : ISafeDelegateInvocationHelper
 #if NET9_0_OR_GREATER
-    where TContent : IDelegateInvocationHelperParameterBuilder, allows ref struct
+    where TArguments : IArgumentsBuilder, allows ref struct
+    where TResult : allows ref struct
 #else
-    where TContent: IDelegateInvocationHelperParameterBuilder
+    where TArguments: IArgumentsBuilder
 #endif
 {
-    private readonly TContent content;
-    private bool hasResult;
+    internal readonly TArguments arguments;
+    private TResult? result = default;
+    private bool hasResult = false;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal DelegateInvocationHelper(TContent content) => this.content = content;
+    internal ReturnHelper(TArguments arguments) => this.arguments = arguments;
 
     /// <inheritdoc cref="ISafeDelegateInvocationHelper.ParametersCount"/>
     public readonly int ParametersCount
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => content.ParametersCount;
+        get => arguments.ParametersCount;
     }
 
     /// <inheritdoc cref="ISafeDelegateInvocationHelper.AcceptsReturn"/>
@@ -39,11 +43,11 @@ public
 
     /// <inheritdoc cref="ISafeDelegateInvocationHelper.AcceptsReturnType(Type)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool AcceptsReturnType(Type type) => false;
+    public readonly bool AcceptsReturnType(Type type) => typeof(TResult).IsAssignableFrom(type);
 
     /// <inheritdoc cref="ISafeDelegateInvocationHelper.AcceptsParameterType(int, Type)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool AcceptsParameterType(int index, Type type) => content.AcceptsParameterType(index, type);
+    public readonly bool AcceptsParameterType(int index, Type type) => arguments.AcceptsParameterType(index, type);
 
     /// <inheritdoc cref="IDelegateInvocationHelper.GetParameter{T}(int)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -51,7 +55,7 @@ public
 #if NET9_0_OR_GREATER
         where T : allows ref struct
 #endif
-        => content.GetParameter<T>(ParametersCount - index - 1);
+        => arguments.GetParameter<T>(ParametersCount - index - 1);
 
     /// <inheritdoc cref="ISafeDelegateInvocationHelper.TryGetParameter{T}(int, out T?)"/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -60,7 +64,7 @@ public
         where T : allows ref struct
 #endif
     {
-        value = content.TryGetParameter<T>(ParametersCount - index - 1, out bool can);
+        value = arguments.TryGetParameter<T>(ParametersCount - index - 1, out bool can);
         return can;
     }
 
@@ -71,15 +75,19 @@ public
         where T : allows ref struct
 #endif
     {
-        if (typeof(T) != typeof(object) && value is not null)
-            Helper.ThrowArgumentException_NoReturn();
+        result = CasterHelper<T?, TResult>.Cast(value);
         hasResult = true;
     }
 
     /// <summary>
     /// Determines if <see cref="IDelegateInvocationHelper.SetResult{T}(T?)"/> was executed.
     /// </summary>
+    /// <param name="result">Result of the invocation, if the method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <see cref="IDelegateInvocationHelper.SetResult{T}(T?)"/> was executed. Otherwise, <see langword="false"/></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool TryGetResult() => hasResult;
+    public readonly bool TryGetResult([NotNullWhen(true)] out TResult? result)
+    {
+        result = this.result;
+        return hasResult;
+    }
 }

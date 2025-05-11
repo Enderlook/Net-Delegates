@@ -1,11 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Enderlook.Delegates.Builder;
+namespace Enderlook.Delegates.InvocationHelpers;
 
 /// <summary>
 /// Represent an implementation of <see cref="ISafeDelegateInvocationHelper"/> which doesn't have any parameter nor accepts a return value.
 /// </summary>
-public struct NoArgumentsInvocationHelper : ISafeDelegateInvocationHelper
+public struct VoidHelper : ISafeDelegateInvocationHelper
 {
     private bool hasResult;
 

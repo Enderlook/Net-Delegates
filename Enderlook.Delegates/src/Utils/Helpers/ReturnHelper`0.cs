@@ -1,16 +1,16 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Enderlook.Delegates.Builder;
+namespace Enderlook.Delegates.InvocationHelpers;
 
 /// <summary>
 /// Represent an implementation of <see cref="ISafeDelegateInvocationHelper"/> which doesn't have any parameter and accepts a return value.
 /// </summary>
 #if NET9_0_OR_GREATER
-public ref struct NoArgumentsInvocationHelper<TResult> : ISafeDelegateInvocationHelper
+public ref struct ReturnHelper<TResult> : ISafeDelegateInvocationHelper
     where TResult : allows ref struct
 #else
-public struct NoArgumentsInvocationHelper<TResult> : ISafeDelegateInvocationHelper
+public struct ReturnHelper<TResult> : ISafeDelegateInvocationHelper
 #endif
 {
     private TResult? result;

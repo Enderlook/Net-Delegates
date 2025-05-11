@@ -1,9 +1,9 @@
-﻿namespace Enderlook.Delegates.Builder;
+﻿namespace Enderlook.Delegates.InvocationHelpers;
 
 /// <summary>
 /// Implementation detail of the library, should not be implemented by consumers.
 /// </summary>
-public interface IDelegateInvocationHelperParameterBuilder
+public interface IArgumentsBuilder
 {
     internal int ParametersCount { get; }
 
