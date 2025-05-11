@@ -9,7 +9,7 @@
     <Product>Enderlook.Delegates</Product>
     <RepositoryUrl>https://github.com/Enderlook/Net-Delegates</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <OutputType>Library</OutputType>
     <LangVersion>13</LangVersion>
     <Nullable>enable</Nullable>
